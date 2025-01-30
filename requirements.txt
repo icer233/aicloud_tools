@@ -11,3 +11,5 @@ pywin32
 tqdm
 m3u8
 aiohttp
+keyboard
+threading

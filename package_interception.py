@@ -1,12 +1,12 @@
-# auto_interceptor_win.py (静默模式版)
 import os
 import sys
 import winreg
 import subprocess
-import time
 import asyncio
+import keyboard  # 用于监听键盘事件
 from mitmproxy import http, options
 from mitmproxy.tools import dump
+import threading  # 用于在单独线程中运行键盘监听
 
 # 配置参数
 PROXY_PORT = 8888
@@ -44,8 +44,8 @@ class WindowsProxyManager:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self._set_proxy(self.original_enable, self.original_server)
-        print("[系统代理] 已恢复原始设置")
+        self._set_proxy(0, f"127.0.0.1:{PROXY_PORT}")
+        print("[系统代理] 已关闭系统代理，可关闭程序")
 
     def _set_proxy(self, enable, server):
         with winreg.OpenKey(
@@ -86,9 +86,6 @@ async def start_proxy():
         listen_port=PROXY_PORT,
         ssl_insecure=True,
         upstream_cert=False,
-        # 关键配置：关闭所有非错误日志
-        #termlog_verbosity="error",  
-        #console_eventlog_verbosity="error"
     )
     
     master = dump.DumpMaster(
@@ -103,11 +100,32 @@ async def start_proxy():
     except KeyboardInterrupt:
         master.shutdown()
 
+def close_proxy_and_exit():
+    """关闭代理并退出程序"""
+    print("[系统代理] 正在关闭代理服务...")
+    # 调用__exit__方法，恢复系统代理设置
+    global proxy_manager
+    proxy_manager.__exit__(None, None, None)
+    sys.exit()
+
+def listen_for_exit():
+    """监听Ctrl+Q键退出程序"""
+    print("[系统就绪] 代理服务运行中 (按 Ctrl+Q 关闭)")
+    keyboard.add_hotkey('ctrl+q', close_proxy_and_exit)  # 当检测到Ctrl+Q时调用close_proxy_and_exit()
+    keyboard.wait('esc')  # 等待ESC键被按下，可以退出键盘监听线程
+
 def main():
-    # ... 保持之前的main函数逻辑 ...
-    with WindowsProxyManager():
+    global proxy_manager
+    proxy_manager = WindowsProxyManager()
+
+    with proxy_manager:
         if sys.version_info >= (3, 8) and sys.platform.startswith("win"):
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        
+        # 启动监听线程
+        listener_thread = threading.Thread(target=listen_for_exit)
+        listener_thread.daemon = True  # 使得程序退出时自动关闭该线程
+        listener_thread.start()
         
         # 静默启动
         print("[系统就绪] 代理服务运行中，仅显示拦截信息...")
