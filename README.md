@@ -54,3 +54,22 @@ git push origin <分支名称>
 - 邮箱：tommydai0909@163.com
 
 - Gitee：[Alex omega/get_aicloud](https://gitee.com/alex-omega/get_aicloud/)
+
+## 待办列表
+
+### 界面
+
+- [ ] 命令行界面
+- [ ] NiceGUI Web 界面
+
+### 赞助
+
+- [ ] 卡密绑定
+- [ ] 水印系统
+- [ ] Star检测
+
+### 功能
+
+- [ ] 一键反反截屏
+- [ ] m3u8拼接问题
+- [ ] 修改爱问云界面
