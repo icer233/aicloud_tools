@@ -1,6 +1,6 @@
 import requests, hashlib,os
 
-UA = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) ai_client/1.07.123 Chrome/89.0.4389.128 Electron/12.0.18 Safari/537.36"
+UA = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) ai_client/1.07.126 Chrome/89.0.4389.128 Electron/12.0.18 Safari/537.36"
 
 def create_path(file_path):
     if not os.path.exists(file_path):
@@ -25,32 +25,34 @@ def getAccessToken(name, passwd, hashed = False):
         "user-agent": UA,
         "platform": "ai",
         "access-token": "previewToken",
-        "content-type": "application/json",
-        "accept": "*/*",
-        "sec-fetch-site": "cross-site",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-dest": "empty",
-        "accept-encoding": "gzip, deflate, br",
-        "accept-language": "zh-CN",
+        "Content-Type": "application/json",
+        "Accept": "*/*",
+        "Sec-Fetch-Site": "cross-site",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "zh-CN",
+        "Connection": "keep-alive"
     }
     if not hashed:
         passwd = hashlib.md5(passwd.encode()).hexdigest()
     login_payload = {
-        "rawName": name,
-        "name": name,
-        "passwd": passwd,
-        "loginName": name,
-        "role": 1,
-        "osInfo": "13th Gen Intel(R) Core(TM) i7-13700H 31.73G 19.99G Windows_NT10.0.22631 ia32 ",
-        "version": "12.0.18_5.51.182",
-        "deviceId": "windows-a7f8caaa-7a77-4468-a93f-9b8359857ff7",
-        "deviceName": "Alex",
-        "systemInfo": "10.0.22631 ia32 1.07.123",
-        "clientVersion": "5.51.182",
+        "clientVersion" : "5.52.217",
+        "deviceId" : "windows-b0a8dea9-174b-41fe-b69d-791fc30dbddc",
+        "deviceName" : "神威-太湖之光",
+        "loginName" : name,
+        "name" : name,
+        "osInfo" : "AMD Ryzen 7 PRO 3700U w/ Radeon Vega Mobile Gfx 5.89G 2.92G Windows_NT10.0.22631 ia32 ",
+        "passwd" : passwd,
+        "rawName" : name,
+        "role" : 1,
+        "systemInfo" : "10.0.22631 ia32 1.07.126",
+        "version" : "12.0.18_5.52.217"
     }
 
-    response = requests.post(login_url, headers=login_headers, json=login_payload)
 
+    response = requests.post(login_url, headers=login_headers, json=login_payload, verify=False)
+    #print(response.text)
     access_token = response.json()["obj"]["access_token"]
     return access_token
 
@@ -77,7 +79,7 @@ def getRecordList(access_token):
         "pageSize": 50000
     }
 
-    response = requests.post(reclist_url, headers=reclist_headers, json=reclist_payload, proxies={"http": None, "https": None})
+    response = requests.post(reclist_url, headers=reclist_headers, json=reclist_payload, proxies={"http": None, "https": None}, verify=False)
 
     record_list = list(response.json()["obj"]["list"])
     # print(record_list)

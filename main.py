@@ -70,7 +70,7 @@ if i not in ["y", "Y"]:
 print("\n\n===========================================================\n正在获取登录令牌……")
 time.sleep(1)
 try:
-    access_token = getAccessToken(up[0], "f379eaf3c831b04de153469d1bec345e", True)
+    access_token = getAccessToken(up[0], passwd, hashed)
 except:
     print("登录失败，请检查用户名和密码是否正确。")
     exit(0)
@@ -86,7 +86,7 @@ name_dict = {}
 bh = 0
 info = {}
 for record_ in record_list:
-    addr = "https://filecdn.plaso.cn/liveclass/plaso/" + record_["fileCommon"]["location"] + "/a1/a.m3u8"
+    addr = "https://filecdn.plaso.cn/liveclass/plaso/" + record_["fileCommon"]["location"] + "/ts1/t.m3u8"
     name = record_["shortDesc"]
     try:
         name_dict[name] += 1
