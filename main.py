@@ -102,7 +102,7 @@ for record_ in record_list:
     bh += 1
     
 for b in range(bh):
-    print("[%s] 课程名称：%s 课程系列序号：%s 课程日期：%s" % (b, info[str(b)]["classname"], name_dict[info[str(b)]["classname"]] - info[str(b)]["classnum"], info[str(b)]["classdate"]))
+    print("[%s] 课程名称：%s 课程系列序号：%s 课程日期：%s" % (b, info[str(b)]["classname"], name_dict[info[str(b)]["classname"]] - info[str(b)]["classnum"], info[str(b)]["classdate"]), info[bh]["addr"])
 
 bhs = input("===========================================================\n请输入需要下载的视频编号（用逗号隔开；连续编号可用连字符，例如：2,3,10-15,21）【方括号内为视频编号】：")
 cwd = os.getcwd()
@@ -112,11 +112,22 @@ bh_list = expand_range_string(bhs).split(",")
 addrlist = {}
 for bh in bh_list:
     create_path(os.path.join(path, info[bh]["classname"]))
-    asyncio.run(mainfunc(info[bh]["addr"], 
-                         os.path.join(
-                             os.path.join(path, info[bh]["classname"]),
-                             "%s 第%s次课.mp4"%(info[str(bh)]["classdate"], info[str(bh)]["classnum"])
-                         ))
-    )
-    
+    try:
+        asyncio.run(mainfunc(info[bh]["addr"], 
+                            os.path.join(
+                                os.path.join(path, info[bh]["classname"]),
+                                "%s 第%s次课.mp4"%(info[str(bh)]["classdate"], info[str(bh)]["classnum"])
+                            ))
+        )
+    except:
+        try:
+            asyncio.run(mainfunc(info[bh]["addr"].replace("ts1","ts101"), 
+                            os.path.join(
+                                os.path.join(path, info[bh]["classname"]),
+                                "%s 第%s次课.mp4"%(info[str(bh)]["classdate"], info[str(bh)]["classnum"])
+                            ))
+            )
+        except:
+            print(info[bh]["classname"],info[str(bh)]["classdate"],"下载出错，请手动操作")
+
 print("\n视频转换完成，请到指定目录查看。\n感谢您的使用！")
